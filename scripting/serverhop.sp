@@ -3,7 +3,7 @@
 #include <sourcemod>
 #include <socket>
 
-#define PLUGIN_VERSION "1.0.2"
+#define PLUGIN_VERSION "1.0.3"
 #define PLUGIN_DESCRIPTION "Provides live server info with join option"
 #define MAX_SERVERS 10
 #define REFRESH_TIME 60.0
@@ -13,8 +13,6 @@
 
 #define A2S_INFO "\xFF\xFF\xFF\xFF\x54Source Engine Query"
 #define A2S_SIZE 25
-
-#define MAX_STR_LEN 160
 
 int
 	g_iServerCount,
@@ -225,7 +223,7 @@ public int Menu_Handler(Menu menu, MenuAction action, int param1, int param2) {
 		if (!g_bConnectedFromFavorites[param1]) {
 			PrintToChat(param1, "\x01[\x03ServerHop\x01] Due to Valve game change, clients must connect via favorites to be redirected by server.");
 			PrintToChat(param1, "\x01[\x03ServerHop\x01] %s:\x03 %s", g_sServer[param1], g_sAddress[param1]);
-			return;
+			return 0;
 		}
 
 		Panel panel = new Panel();
@@ -242,6 +240,8 @@ public int Menu_Handler(Menu menu, MenuAction action, int param1, int param2) {
 	else if (action == MenuAction_End) {
 		delete menu;
 	}
+
+	return 0;
 }
 
 public int MenuConfirmHandler(Menu menu, MenuAction action, int param1, int param2) {
@@ -256,6 +256,8 @@ public int MenuConfirmHandler(Menu menu, MenuAction action, int param1, int para
 	}
 	g_sAddress[param1][0] = '\0';
 	g_sServer[param1][0] = '\0';
+
+	return 0;
 }
 
 public Action RefreshServerInfo(Handle timer) {
@@ -269,6 +271,8 @@ public Action RefreshServerInfo(Handle timer) {
 	}
 
 	CreateTimer(SERVER_TIMEOUT, CleanUp);
+
+	return Plugin_Continue;
 }
 
 public Action CleanUp(Handle timer) {
@@ -288,6 +292,8 @@ public Action CleanUp(Handle timer) {
 			g_iAdvertInterval = 1;
 		}
 	}
+
+	return Plugin_Handled;
 }
 
 public void Advertise() {
@@ -477,4 +483,5 @@ public void OnSocketError(Handle sock, const int errorType, const int errorNum, 
 
 Action timerErrorCooldown(Handle timer) {
 	g_bCoolDown = false;
+	return Plugin_Handled;
 }
