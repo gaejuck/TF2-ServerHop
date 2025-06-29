@@ -510,7 +510,7 @@ Action AdminCheckKick(Handle timer, int ref) {
 
     if(CheckCommandAccess(client, "sm_map", ADMFLAG_CHANGEMAP)) return Plugin_Continue;
 
-    //if(g_iServerPlayerCount[0] >= g_iServerMaxPlayerCount[0] - 4) return Plugin_Continue;
+    if(g_iServerPlayerCount[0] >= g_iServerMaxPlayerCount[0]) return Plugin_Continue;
 
 	int KickAt = RoundToCeil(g_iServerPlayerCount[0] / 2.0);
 	int playersOnServer = CountPlayersOnServer();
@@ -520,23 +520,11 @@ Action AdminCheckKick(Handle timer, int ref) {
 	if(g_bConnectedFromFavorites[client])
 	{
 		ClientCommand(client,"redirect %s:%i", g_sServerAddress[0], g_iServerPort[0]);
-		//CreateTimer(1.0, RedirectPlayer, EntIndexToEntRef(client), TIMER_FLAG_NO_MAPCHANGE);
 	}
 	else
 	{
-		KickClient(client, "카니발 서버의 현 최대 인원 %d 명이 넘어섰습니다. 랜드 서버로 접속 바랍니다. -> %s:%i", KickAt, g_sServerAddress[0], g_iServerPort[0]);
+		KickClient(client, "%t", "RerouteKick", KickAt, g_sServerAddress[0], g_iServerPort[0]);
 	}
-
-	return Plugin_Continue;
-}
-
-Action RedirectPlayer(Handle timer, int ref)
-{
-	int client = EntRefToEntIndex(ref);
-	if(!IsValidClient(client)) return Plugin_Continue;
-	
-	int KickAt = RoundToCeil(g_iServerPlayerCount[0] / 2.0);
-	KickClient(client, "카니발 서버의 현 최대 인원 %d 명이 넘어섰습니다. 랜드 서버로 접속 바랍니다. -> %s:%i", KickAt, g_sServerAddress[0], g_iServerPort[0]);
 
 	return Plugin_Continue;
 }
